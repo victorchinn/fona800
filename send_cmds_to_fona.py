@@ -1,6 +1,12 @@
 #!/usr/bin/python
 import serial
 import time
+from bmp280 import PiBMP280
+from vl53l0x import *
+
+# create an instance of the pi gpio driver.
+pi_gpio= PiGpio()  # the () starts the init function
+
 
 
 #ATI - Get the module name and revision
@@ -18,12 +24,12 @@ def setup():
     ser.write('ATI \r\n')
     time.sleep(0.1)
     read_val = ser.read(size=64)
-    print read_val
+    #print read_val
 
     ser.write('AT+CCID \r\n')
     time.sleep(0.1)
     read_val = ser.read(size=64)
-    print read_val
+    #print read_val
 
     ser.write('AT+COPS?\r\n')
     time.sleep(0.1)
@@ -33,17 +39,13 @@ def setup():
     ser.write('AT+CSQ\r\n')
     time.sleep(0.1)
     read_val = ser.read(size=64)
-    print read_val
+    #print read_val
 
     ser.write('AT+CBC\r\n')
     time.sleep(0.1)
     read_val = ser.read(size=64)
-    print read_val
+    #print read_val
 
-    ser.write('AT+COPS?\r\n')
-    time.sleep(0.1)
-    read_val = ser.read(size=64)
-    print read_val
     return
 
 
@@ -52,11 +54,11 @@ def send_sms(_phone_number,_text_to_send):
     ser.write('AT+CMGF=1\r\n')
     time.sleep(0.1)
     read_val = ser.read(size=64)
-    print read_val
+    #print read_val
 
     ser.write('AT+CMGS="')
     ser.write(_phone_number)
-    ser.write("\r\n')
+    ser.write('"\r\n')
     time.sleep(0.1)
     read_val = ser.read(size=64)
 
@@ -68,20 +70,59 @@ def send_sms(_phone_number,_text_to_send):
     return
 
 
+def connect_to_phone_and_send():
+
+    
+    
+    phone_number = raw_input('Enter Phone #:')
+    name = raw_input('Enter Name:')
+    
+    setup()
+    print "Sending to Phone # ",phone_number
+    #print "Message: ",text_message
+
+
+    # Read the Sensor Temp/Pressure values.
+    (temperature, pressure) = pi_bmp280.readBMP280All()
+    preamble = name + ": from exactly where you are standing now, the "
+    
+    temperature_f = (temperature * 9/5) + 32 
+    
+    text_message = preamble + "measured Temp = " + str(temperature_f) + "F, and Pressure =  " + str(pressure) + "hPa"
+    print text_message
+
+    send_sms(phone_number,text_message)
+   
+    ser.close()
+    return
+
+# get the temperature and pressure
+
+# create an instance of my pi bmp280 sensor object
+pi_bmp280 = PiBMP280()
+
 # open the serial port to connect to the Fona 800
 ser = serial.Serial('/dev/ttyS0', 9600, timeout=0.5)
 ser.write('AT\r\n')
 time.sleep(0.1)
-
 read_val = ser.read(size=64)
-print read_val
+#print read_val
 
-phone_number = raw_input('Enter Phone #:')
-text_message = raw_input('Enter Message:')
+bus = smbus.SMBus(1)
+address = 0x29
+pi_gpio.set_led(1,False)
+pi_gpio.set_led(2,False)
+pi_gpio.set_led(3,False)
+init_chip()
+inside_loop()
 
-setup()
-send_sms(phone_number,text_message)
 
 
-ser.close()
+
+
+connect_to_phone_and_send()
+
+
+
+
 

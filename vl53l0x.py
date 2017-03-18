@@ -1,7 +1,8 @@
 import smbus
 import struct
 import time
-from gpio import PiGpio # from the gpio.py file get the PiGpio object
+from gpio import PiGpio 
+# from the gpio.py file get the PiGpio object
 
 # create an instance of the pi gpio driver.
 pi_gpio= PiGpio()  # the () starts the init function
@@ -123,8 +124,8 @@ address = 0x29
 pi_gpio.set_led(1,False)
 pi_gpio.set_led(2,False)
 pi_gpio.set_led(3,False)
-init_chip()
-inside_loop()
+#init_chip()
+#inside_loop()
 
 
 

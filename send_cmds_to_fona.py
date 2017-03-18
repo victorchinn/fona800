@@ -96,6 +96,53 @@ def connect_to_phone_and_send():
     ser.close()
     return
 
+def open_gprs_session():
+
+   #setup?
+   setup()
+
+   # AT+SAPBR=3,1,"Contype","GPRS"
+   # OK
+   ser.write('AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\r\n')
+   time.sleep(0.1)
+   read_val = ser.read(size=64)
+   print read_val
+
+   # Set bearer parameter
+   # AT+SAPBR=3,1,"APN","CMNET"
+   # OK
+   ser.write('AT+SAPBR=3,1,\"APN\","fast.t-mobile.com\"\r\n')
+   time.sleep(0.1)
+   read_val = ser.read(size=64)
+   print read_val
+
+   # Set bearer context
+   # AT+SAPBR=2,1
+   # OK
+   ser.write('AT+SAPBR=2,1\r\n')
+   time.sleep(0.1)
+   read_val = ser.read(size=64)
+   print read_val
+
+
+   # Get current longitude , latitude
+
+   ser.write('AT+CIPGSMLOC=1,1\r\n')
+   time.sleep(2.0)
+   read_val = ser.read(size=128)
+   print read_val
+
+   return
+
+def open_fm_radio():
+
+#AT+FMOPEN=0
+#AT+FMVOLUME=0
+#AT+FMFREQ=885
+#AT+FMSIGNAL=885
+#AT+FMCLOSE
+
+    return
 # get the temperature and pressure
 
 # create an instance of my pi bmp280 sensor object
@@ -113,16 +160,19 @@ address = 0x29
 pi_gpio.set_led(1,False)
 pi_gpio.set_led(2,False)
 pi_gpio.set_led(3,False)
-init_chip()
-inside_loop()
 
 
+#initialize the bmp280 chip
+#init_chip() 
+#run a loop until an object is held at the midway point above the IR sensor (green light will hold)
+#inside_loop()
 
+#send an SMS message to the phone by reading input phone # and add a name
+#connect_to_phone_and_send()
 
+#open a GPRS session for testing
 
-connect_to_phone_and_send()
-
-
+open_gprs_session()
 
 
 
